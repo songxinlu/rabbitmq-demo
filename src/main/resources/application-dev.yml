@@ -1,0 +1,50 @@
+debug: false
+
+spring:
+  thymeleaf:
+    cache: false
+  rabbitmq:
+    addresses: 192.168.32.139:5672,192.168.32.138:5672,192.168.32.137:5672
+#    host: 192.168.32.139
+#    port: 5672
+    username: guest
+    password: guest
+    virtual-host: / # 虚拟host
+    publisher-confirm-type: correlated # 确认消息已发送到交换机(Exchange)  发送确认
+    publisher-returns: true # 确认消息已发送到队列(Queue)  发送回调
+    connection-timeout: 4000
+    template:
+      mandatory: true # 当exchange无法找到任何一个合适的queue时，将消息return给生产者
+      receive-timeout: 30000 # 消费端接收的响应时间
+      reply-timeout: 30000 # 发送端等待接收消费端给出return msg的时间，相当于在message同步时，发送并消费成功的时间
+      retry:
+        enabled: true
+        max-attempts: 6 # 最大重试次数
+        initial-interval: 2000 # 重试初始间隔时间
+        multiplier: 2 # 间隔时间乘子，间隔时间*乘子=下一次的间隔时间，最大不能超过设置的最大间隔时间
+        max-interval: 64000 # 最大重试时间间隔
+    listener:
+      simple:
+        acknowledge-mode: auto # 自动确认
+        auto-startup: true # 是否启动时自动启动容器
+        concurrency: 1 # 最小的消费者数量
+        max-concurrency: 5 # 最大的消费者数量
+        default-requeue-rejected: true # 投递失败时是否重新排队；默认是true（与参数acknowledge-mode有关系）
+        retry:
+          enabled: true
+          max-attempts: 6
+          initial-interval: 2000
+          multiplier: 2
+          max-interval: 64000
+          stateless: true # 不论重试是有状态的还是无状态的
+
+
+
+rabbitmq:
+  mqtt:
+    url: tcp://192.168.32.138:1883
+    front-url: ws://192.168.32.138:15675/ws
+    defaultTopic: defaultSampleTopic
+
+
+
